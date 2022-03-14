@@ -1,20 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <openssl/rand.h>
+#include <openssl/err.h>
 
-#define SIZE 128
+#define SIZE 128/8
+
+void err_handler(void){
+  ERR_print_errors_fp(stderr);
+  abort();
+}
 
 int main(){
   unsigned char *buff1, *buff2, *res;
   int i;
 
-  buff1=(char*) malloc(SIZE*sizeof(char));
-  buff2=(char*) malloc(SIZE*sizeof(char));
-  res=(char*) malloc(SIZE*sizeof(char));
+  buff1=(unsigned char*) malloc(SIZE*sizeof(unsigned char));
+  buff2=(unsigned char*) malloc(SIZE*sizeof(unsigned char));
+  res=(unsigned char*) malloc(SIZE*sizeof(unsigned char));
 
-  RAND_bytes(buff1,SIZE);
-    //ERR_print_err_fp(stderr);
-  RAND_bytes(buff2,SIZE);
+  if(RAND_load_file("/dev/random", 64) != 64){
+    err_handler();
+  }
+
+  if(!RAND_bytes(buff1,SIZE)){
+    err_handler();
+  }
+  if(!RAND_bytes(buff2,SIZE)){
+    err_handler();
+  }
 
   for(i=0; i<SIZE ; i++){
     res[i]=buff1[i]^buff2[i];
