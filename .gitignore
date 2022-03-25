@@ -1,5 +1,6 @@
 *.out
 *.pdf
 *.txt
+*.enc
 random_numbers/es3.c
 practice/
